@@ -258,7 +258,7 @@
             type="text"
             icon="el-icon-notebook-1"
             @click="handleRecord(scope.row)"
-            >实验进展</el-button
+            >样本状态</el-button
           >
         </template>
       </el-table-column>
@@ -347,7 +347,9 @@
         <el-form-item label="甘特图地址" prop="ganttUrl" label-width="150px">
           <el-input v-model="form.ganttUrl" placeholder="请输入甘特图地址" />
         </el-form-item>
-        <el-row>
+        <el-row v-if="(currentUser && currentUser === form.manageBy) 
+                        || (currentRoles && currentRoles.includes('物料采购管理员'))"
+        >
           <el-col :span="8">
             <el-form-item label="选择质粒">
               <el-button
@@ -400,7 +402,7 @@
           prop="resistanceGene"
         />
         <el-table-column
-          label="实验进展"
+          label="样本状态"
           align="center"
           prop="progressStatus"
         />
@@ -426,6 +428,7 @@
           align="center"
           width="80"
           class-name="small-padding fixed-width"
+           v-if="(currentUser && currentUser === form.manageBy)|| (currentRoles && currentRoles.includes('物料采购管理员'))"
         >
           <template slot-scope="scope">
             <el-button
@@ -440,7 +443,7 @@
       </el-table>
 
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button  v-if="(currentUser && currentUser === form.manageBy)|| (currentRoles && currentRoles.includes('物料采购管理员'))" type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -562,7 +565,7 @@ import {
 } from "@/api/plasmid/experiment";
 import selectPlasmidGene from "../../components/select-plasmid-geneExp/index";
 import { Message } from "element-ui";
-import { listUserAll } from "@/api/system/user";
+import { getCurrentUser, getCurrentRole, listUserAll } from "@/api/system/user";
 export default {
   name: "Experiment",
   components: { selectPlasmidGene },
@@ -621,12 +624,16 @@ export default {
       openProjectRecord: false,
       projectRecordList: [],
       projectRecordTitle: "项目进展记录",
+      currentRoles: [],
+      currentUser: null,
     };
   },
   created() {
     this.initDateRange();
     this.getList();
     this.getUserList();
+    this.getUser();
+    this.getRole();
   },
   computed: {
     sortedProjectRecordList() {
@@ -649,6 +656,17 @@ export default {
     },
   },
   methods: {
+    // 获取当前登录用户
+    getUser() {
+      getCurrentUser().then((response) => {
+        this.currentUser = response;
+      });
+    },
+    getRole(){
+      getCurrentRole().then((response) => {
+        this.currentRoles = response;
+      });
+    },
     getFileIcon(filePath) {
       const ext = filePath.split(".").pop().toLowerCase();
       const iconMap = {
@@ -730,7 +748,7 @@ export default {
     },
     handleSubmitProgress() {
       if (!this.recordDate) {
-        Message.error("请选择实验进展日期");
+        Message.error("请选择项目进展日期");
         return;
       }
       this.newProgressList.forEach((item) => {
@@ -738,10 +756,10 @@ export default {
         item.projectStatus = item.newStatus; // 假设新状态为当前项目状态
         updateExperimentProgress(item)
           .then(() => {
-            Message.success(item.projectName + "实验进展更新成功");
+            Message.success(item.projectName + "项目进展更新成功");
           })
           .catch(() => {
-            Message.error(item.projectName + "实验进展更新失败");
+            Message.error(item.projectName + "项目进展更新失败");
           });
       });
       this.openProgress = false;

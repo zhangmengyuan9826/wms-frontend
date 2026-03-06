@@ -17,7 +17,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="实验进展" prop="progressStatus">
+      <el-form-item label="样本状态" prop="progressStatus">
           <el-select
             v-model="queryParams.progressStatus"
             default-first-option
@@ -62,7 +62,7 @@
       <el-table-column label="质粒名称" align="center" prop="geneName" />
       <el-table-column label="酶切位点" align="center" prop="linearDigestion" />
       <el-table-column label="抗性基因" align="center" prop="resistanceGene" />
-      <el-table-column label="实验进展状态" align="center" prop="progressStatus" />
+      <el-table-column label="样本状态" align="center" prop="progressStatus" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
             <el-button

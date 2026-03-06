@@ -215,7 +215,7 @@ export const dynamicRoutes = [
         path: 'index/:projectNo',
         component: () => import('@/views/plasmid/experiment/experiment_list'),
         name: 'ExperimentList',
-        meta: { title: '实验进展', activeMenu: '/plasmid/experiment' }
+        meta: { title: '样本状态', activeMenu: '/plasmid/experiment' }
       }
     ]
   },
