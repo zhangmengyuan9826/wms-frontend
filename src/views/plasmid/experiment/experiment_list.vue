@@ -51,6 +51,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['stock:record:add']"
+          v-if="(currentUser && currentUser === manageBy) 
+                        || (currentRoles && currentRoles.includes('物料采购管理员'))"
           >更新状态</el-button
         >
       </el-col>
@@ -153,7 +155,7 @@
           prop="resistanceGene"
         />
         <el-table-column
-          label="实验进展"
+          label="样本状态"
           align="center"
           prop="progressStatus"
         />
@@ -191,6 +193,7 @@ import ExperimentStatusTable from "../../components/experiment-table/index";
 import { getDictDataListByDictType } from "@/api/plasmid/dictData";
 import { getDicts } from "@/api/system/dict/data";
 import { Message } from "element-ui";
+import { getCurrentUser, getCurrentRole } from "@/api/system/user";
 
 export default {
   name: "Record",
@@ -225,6 +228,9 @@ export default {
       projectNo: "",
       detailList: [],
       recordListDone: false,
+      currentRoles: [],
+      currentUser: null,
+      manageBy: "",
     };
   },
   created() {
@@ -232,6 +238,17 @@ export default {
     this.initDateRange();
   },
   methods: {
+    // 获取当前登录用户
+    getUser() {
+      getCurrentUser().then((response) => {
+        this.currentUser = response;
+      });
+    },
+    getRole(){
+      getCurrentRole().then((response) => {
+        this.currentRoles = response;
+      });
+    },
     initDateRange(){
       const end = new Date();
       const start = new Date();
@@ -303,6 +320,8 @@ export default {
         this.projectNo = projectNo;
         this.getList();
         this.setDefaultProjectNo(projectNo);
+        this.getUser();
+        this.getRole();
       });
     },
     getField() {
@@ -347,6 +366,7 @@ export default {
         this.recordList = response.data;
         this.loading = false;
         this.recordListDone = true;
+        this.manageBy = this.recordList[0].manageBy;
       });
     },
     /** 搜索按钮操作 */

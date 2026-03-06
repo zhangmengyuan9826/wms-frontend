@@ -145,3 +145,11 @@ export function getCurrentUser() {
     method: 'get'
   })
 }
+
+// 查询用户个人权限
+export function getCurrentRole() {
+  return request({
+    url: '/system/user/getUserRole',
+    method: 'get'
+  })
+}
